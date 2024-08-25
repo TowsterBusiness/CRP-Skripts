@@ -1,4 +1,4 @@
-![https://imgur.com/a/ljOUsof](https://imgur.com/a/ljOUsof)
+![https://imgur.com/a/ljOUsof](ss.png)
 
 # CRP Skripts
 
