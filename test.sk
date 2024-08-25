@@ -1,0 +1,26 @@
+# on player move:
+#     set player speed to 0
+
+command /test [<text>]:
+    trigger:
+        loop 2 times:
+            profiler("test", "loop")
+            wait 10 seconds
+            profiler("test", "profile", "stop")
+        send "done"
+        # yamlLoad("test")
+        # set yaml index 1 in list "list.test" from "test" to "1"
+        # set yaml index 2 in list "list.test" from "test" to "2"
+        # set yaml index 3 in list "list.test" from "test" to "3"
+        # set yaml index 4 in list "list.test" from "test" to "4"
+        # set yaml index 5 in list "list.test" from "test" to "5"
+        # delete yaml index 1 in list "list.test" from "test"
+        # set {_x} to yaml index 1 in list "list.test" from "test"
+        # broadcast {_x}
+
+        
+
+        #console command "tellraw @a ""§1TEST """
+        #send "&c⚠ &7Warning"
+        #send "&9ⓘ &7Info"
+        #send "&e⚡ &7  Debug"

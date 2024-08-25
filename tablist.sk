@@ -1,0 +1,7 @@
+on join:
+    set players' tab list header to "%nl%&3&l        Campus Roleplay        &f%nl%"
+    #set player tab footer to 
+
+on leave:
+    reset player's tab list header
+    reset player's tab list footer
