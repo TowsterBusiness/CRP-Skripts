@@ -47,3 +47,32 @@ function swearList():
     createDoc({_f}, {_d1}, {_h}, " ")
     createDoc({_f}, {_d2}, {_h}, "&4&m------------------------------")
     createDoc({_f}, {_d2}, {_h}, "&c&lSwear &e&lDevList &7[%{_count}%]")
+
+    createDoc({_f}, {_d2}, {_h}, " ")
+    loop yaml node keys "words" from "swear":
+        set {_val::*} to split yaml value "words.%loop-val%" from "swear" at " "
+        
+        createDoc({_f}, {_d1}, {_h2}, " &4&l%{_val::1}%", "body") if {_val::1} is not {_prev}
+        createDoc({_f}, {_d2}, {_h2}, " &4&l%{_val::1}%", "body") if {_val::1} is not {_prev}
+        createDoc({_f}, {_d1}, {_b}, " &4&l> &r%loop-val%")
+
+
+        if loop-val matches {_x}:
+            createDoc({_f}, {_d2}, {_b}, " &2&l✔ &r%loop-val% &8▪ &e%{_val::2}%")
+        else:
+            createDoc({_f}, {_d2}, {_b}, " &4&l❌ &c%loop-val% &8▪ &e%{_val::2}%")
+        
+        set {_prev} to {_val::1}
+    save yaml "swear-doc"
+
+
+function swearCheck(p: player, t: text):
+    loop yaml node keys "words" from "swear":
+        set {_x} to yaml value "words.%loop-val%" from "swear"
+        set {_x::*} to split {_x} at " "
+        if {_t} matches {_x::2}:
+            set metadata value "swearWRD" of {_p} to loop-val # Detected Word
+            set metadata value "swearCAT" of {_p} to {_x::1}
+            set metadata value "msg" of {_p} to {_t} # Message
+ 
+            stop loop
