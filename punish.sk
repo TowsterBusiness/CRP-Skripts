@@ -175,3 +175,41 @@ function punish(p1: player, p2: offline player, cat: text, reason: text, warn: t
         # unload yaml "punish/%{_p2}'s uuid%"
 
 
+
+
+        log "%now% %{_p1}%: %{_p2}% %{_cat}% %{_p::3}% %{_p::4}% >> %{_reason}%" to "punish.log"
+
+        yamlLoad("punish/%{_p2}'s uuid%")
+        set yaml value "player.%{_day}%.%round(unix timestamp of now)%" from "punish/%{_p2}'s uuid%" to "%{_p1}% %{_cat}% %{_p::3}% %{_p::4}%"
+        save yaml "punish/%{_p2}'s uuid%"
+        unload "punish/%{_p2}'s uuid%"
+
+        yamlLoad("punish/%{_p1}'s uuid%")
+        set yaml value "staff.%{_day}%.%round(unix timestamp of now)%" from "punish/%{_p1}'s uuid%" to "%{_p2}% %{_cat}% %{_p::3}% %{_p::4}%"
+        save yaml "punish/%{_p1}'s uuid%"
+        unload "punish/%{_p1}'s uuid%"
+        
+        #yaml log check - check last day for bans, limit to current day with mutes
+        #yaml log add
+        #enforce
+
+
+
+
+        set {_player::*} to snitch("!staff")
+        set {_staff::*} to snitch("staff")
+        set {_desc} to yaml value "description.%loop-val%" from "punish"
+        set {_desc} to "|&c%subtext of {_desc} from characters 2 to (length of {_desc})%"
+        tellraw("&c⚠ &7Punished user &f%{_p2}% &7for %{_desc}% |&7%{_p::3}%$hTime is not informed|", {_player::*})
+        tellraw("&c⚠ &7Punished user &f%{_p2}% &7for %{_desc}% &7time &c%{_p::3}% %{_p::4}% &7by &r%{_p1}%", {_staff::*})
+        stop loop
+
+            #short burst warnings: enforced
+            #spread out: default enforcement
+
+
+#function warn():
+#    set {_null} to "none"
+
+#function punish(p: player, act: text):
+#    send {_act} to {_p}
