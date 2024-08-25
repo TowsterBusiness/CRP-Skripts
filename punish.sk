@@ -141,3 +141,37 @@ function punish(p1: player, p2: offline player, cat: text, reason: text, warn: t
 
 
 
+
+
+
+
+
+        # # Reverse Punishes
+        # yamlLoad("punish/%{_p2}'s uuid%")
+        # loop yaml node keys "player.%{_day}%" from "punish/%{_p2}'s uuid%":
+        #     add loop-value-2 to {_x::*}
+        # set {_x::*} to reversed {_x::*}
+
+
+        # set {_prev} to unix timestamp of now
+        # loop {_x::*}:
+        #     # Time Calc
+        #     set {_now} to loop-value-2 parsed as number
+        #     set {_span} to abs({_now} - {_prev})
+        #     set {_span} to {_span} / 60
+        #     broadcast {_span}
+
+        #     # Log Interpreter
+        #     set {_z::*} to split yaml value "player.%{_day}%.%loop-value-2%" from "punish/%{_p2}'s uuid%" at " "
+        #     set {_type} to last 1 character of {_z::4}
+        #     set {_time} to subtext of {_z::4} from characters 1 to (length of {_z::4} - 1)
+        #     set {_time} to {_time} * 60 if {_type} is "h"
+        #     set {_time} to {_time} parsed as number * 2 if {_type} is not "d"
+            
+
+
+        #     set {_prev} to loop-value-2 parsed as number
+        #     stop loop if {_z::3} is "clear"
+        # unload yaml "punish/%{_p2}'s uuid%"
+
+
