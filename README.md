@@ -28,9 +28,23 @@ As a prerequisite, you should make sure you have Java installed and up to date o
 13. Hit enter and after running the command, you will notice a failed to load properties error along with failed to load eula.txt. Do not worry as you will just need to rerun this command once we have configured these files.
 14. Back in the Minecraft Server folder open the “eula.txt’ file that has been created with your text editor. Here you will need to set the eula=false to eula=true and save.
 15. Put this compilied mod into the mods folder
-16. Now you just have to rerun the launch command in the command prompt and the server should be running! Repeat steps 8-9 to launch the server again.
-17. To access the items, use /give-united to access them. 
+16. Then download Skript and put that into your mods folder as well
+17. Now you just have to rerun the launch command in the command prompt and the server should be running! Repeat steps 8-9 to launch the server again.
+18. To access the items, use /give-united to access them. 
 
 Making sure you are in the Minecraft Server file directory and enter java -jar “your jar name”.jar into command prompts 
 
 You will also need to forward the port listed in server.properties query.port. The default it is 25565 so in your router settings you will need to specify that port to forward. This process will vary from different router manufacturers. If you need assistance in forwarding a port, please refer to your router’s help site/manual. 
+
+By default, if you did not specify anything in the server-ip setting, the server will point to your public IP, this is what other players will need to connect to your server and play with you. 
+
+You can find your public IP by simply typing in your search browser: “What is my public IP?” make sure you look for an IP address that is IPv4, this means it only has three decimals and only contains numbers. 
+
+Once you have your public IP, we STRONGLY urge you to not give it out publicly and advertise with it as giving your public IP out publicly is a security risk to your home network. Only give out your IP to people you would like to play with and trust. 
+
+When a player wants to connect to your server, they will enter your public IP address followed by :25565 into the IP field of the server menu. The full address should look something like this: 12.34.56.78:25565 
+
+If you are the host, you can either connect to it by typing the public IP or by simply typing ‘localhost’ if your server is running on the computer you play Minecraft with.
+
+The distribution of your server can be revealing (since you are exposing your ip adress), but by using domains you can be secure while you do it. 
+You can buy domain servers and use those domains to distribute your ip adress, hidden through a domain. This means that your domain is not completely exposed to hackers.
