@@ -107,3 +107,37 @@ function punishHelp():
         set {_prev::*} to yaml value "punish.%loop-val%" from "punish" split at " "
         wait 2 tick
     save yaml "punish-doc"
+
+
+function punish(p1: player, p2: offline player, cat: text, reason: text, warn: text = "false"):
+    loop yaml node keys "punish" from "punish":
+
+        set {_p::*} to yaml value "punish.%loop-val%" from "punish" split at " "
+        if {_p::2} is "none":
+            set {_match} to loop-val
+        else:
+            set {_match} to {_p::2}
+
+        {_cat} matches {_match}
+        set {_day} to now formatted as "MM/dd/yyyy"
+
+        #Reason Puller
+        if {_reason} is not set:
+            set {_reason::*} to yaml value "description.%loop-val%" from "punish" split at "$h"
+            set {_reason} to subtext of {_reason::2} from characters 1 to (length of {_reason::2} - 1)
+
+        #Temporary Punisher
+        if {_p::3} is "mute":
+            set metadata value "mute" of {_p2} to unix timestamp of now + formatTime({_p::4})
+        else if {_p::3} is "ban":
+            set {_time} to formatTime({_p::4})
+            ban {_p2} due to "%{_cat}% | %{_reason}%" for "%{_time}% seconds" parsed as timespan
+            ban {_p2} by IP due to "%{_cat}% | %{_reason}%" for "%{_time}% seconds" parsed as timespan
+            kick {_p2} due to "You have been kicked for %{_cat}% | %{_reason}%"
+        else if {_p::3} is "pardon":
+            clear metadata value "mute" of {_p2}
+            unban {_p2}
+            unban {_p2} by IP
+
+
+
