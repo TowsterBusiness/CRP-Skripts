@@ -61,3 +61,49 @@ on chat:
     set {_time} to "%{_len}% seconds" parsed as timespan
     send "&cYou are currently muted for &7%{_time}%"
     cancel event
+
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           FUNCTION
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+function formatTime(t: text) :: number:
+    set {_x::*} to split {_t} by " "
+    loop {_x::*}:
+        set {_type} to last 1 character of loop-value
+        set {_time} to subtext of loop-value from characters 1 to (length of loop-value - 1) parsed as number
+        set {_time} to {_time} * 24 if {_type} is "d" # hours
+        set {_time} to {_time} * 60 if {_type} is "h" or "d" # minutes
+        set {_time} to {_time} * 60 # seconds
+        set {_r} to {_r} + {_time}
+    return {_r}
+    
+
+
+function punishHelp():
+    set {_f} to "punish-doc"
+    set {_d} to "reason"
+    set {_h} to "head"
+    set {_h2} to "subhead"
+    set {_b} to "body"
+    deleteDoc("punish-doc")
+    loop yaml node keys "punish" from "punish":
+        set {_count} to {_count} + 1
+        wait 2 tick
+    createDoc({_f}, {_d}, {_h}, "&4&m------------------------------")
+    createDoc({_f}, {_d}, {_h}, "&c&l Punish Reasons &7[%{_count}%]")
+    createDoc({_f}, {_d}, {_h}, " ")
+    
+    set {_prev} to "none"
+    loop yaml node keys "punish" from "punish":
+        set {_next::*} to yaml value "punish.%loop-val%" from "punish" split at " "
+        if {_next::1} is not {_prev::1}:
+            createDoc({_f}, {_d}, {_h2}, " &4&l%{_next::1} in strict proper case%", "body")
+        set {_desc} to yaml value "description.%loop-val%" from "punish"
+        createDoc({_f}, {_d}, {_b}, "&4&l > &r%{_desc}%")
+
+        set {_prev::*} to yaml value "punish.%loop-val%" from "punish" split at " "
+        wait 2 tick
+    save yaml "punish-doc"
