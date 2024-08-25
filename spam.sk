@@ -158,3 +158,34 @@ function spam(m: text, p: player):
     set metadata value "spamTime" of {_p} to unix timestamp of now
 
 #TODO: Ratio for similair messages, if too many words are alike to current message then flag: " " or * * should be resolved
+
+
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           COMMAND
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+command /spam [<text>] [<text>]:
+    permission: staff
+    permission message: &cYou do not haver permissions to perform this command!
+    trigger:
+
+
+        #NOTE: HELP COMMAND
+        if arg 1 is "help":
+            readDoc("punish", "spam help", player, arg 2)
+        else if arg 1 is not set:
+            readDoc("punish", "spam help", player, arg 2)
+        
+
+        #NOTE: CHECK COMMAND
+        if arg 1 is "check":
+            send "beta"
+            #TODO: Need to split spam engine from message / informer
+
+
+#PUNISH TAB COMPLETE
+on tab complete of "/spam":
+    set tab completions for position 1 to "help", "check"
