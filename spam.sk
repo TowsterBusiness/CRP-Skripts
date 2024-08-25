@@ -1,0 +1,26 @@
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                            spam
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+options:
+    package: false #set true if dependant on a chat system
+    wps: 0.109
+    w: 4   # word spam: hi hi hi hi
+    wl: 15 # word length: ThisMessageIsLong
+    cs: 7 # character sum: hihihihihi
+    cr: 5  # character repeat: hiiiiii
+    #cc: 4  # character caps: HIIII
+    cw: 3  # all caps word: HIII HIII HIII
+    s: 50   # sentence spam
+    sc: 4   # sentence cached
+    prev: 30 # preview sentence 
+
+on quit:
+    clear metadata value "spamTime" of player
+
+
+on chat:
+    {@package} is false
+    spam(message, player)
