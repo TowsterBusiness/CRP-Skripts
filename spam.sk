@@ -24,3 +24,94 @@ on quit:
 on chat:
     {@package} is false
     spam(message, player)
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           FUNCTION
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+
+function spam(m: text, p: player):
+    set {_d::*} to snitch("debug")
+    set {_file} to "player/%{_p}'s uuid%"
+    yamlLoad({_file})
+
+
+    #NOTE: Time
+    set {_t} to unix timestamp of now - metadata value "spamTime" of {_p}
+    if {_t} < length of {_m} * {@wps}:
+        set {_return::t} to true
+        set {_return::t::1} to {_t}
+    #send "&7Message %{_t}% seconds" to {_p} #DEBUG
+
+
+    #NOTE: WORD
+    set {_w::*} to split {_m} at " "
+    loop {_w::*}:
+        
+        
+        # Repeated Word Count - yes yes yes yes
+        set {_words::%loop-value-1%} to {_words::%loop-value-1%} + 1
+        if {_words::%loop-value-1%} > {@w}:
+            set {_return::w} to true
+            set {_return::w::%loop-value-1%} to {_words::%loop-value-1%}
+        
+        # Repeated Caps Lock - HI HI HI HI
+        set {_cap} to {_cap} + 1 if loop-value-1 matches "[A-Z1-9].*"
+        if {_cap} > {@cw}:
+            set {_return::cw} to true
+
+
+        # Word Length - ThisMessageIsLong
+        if length of loop-value-1 > {@wl}:
+            all players do not contain loop-value-1
+            set {_return::wl} to true
+            set {_return::wl::%loop-value-1%} to length of loop-value-1
+
+        # Repeated Character Count - yaaaaaaaaas & yasasasasas
+        set {_char::*} to split loop-value-1 at ""
+        loop {_char::*}:
+            if loop-value-2 is not "":
+                set {_sum::%loop-value-2%} to {_sum::%loop-value-2%} + 1
+                set {_rep::%loop-value-2%} to {_rep::%loop-value-2%} + 1
+
+                if {_old} is not loop-value-2:
+                    set {_rep::%loop-value-2%} to 0
+                set {_old} to loop-value-2
+
+                if {_rep::%loop-value-2%} > {@cr}:
+                    set {_return::cr} to true
+                    set {_return::cr::%loop-value-2%} to {_rep::%loop-value-2%}
+                if {_sum::%loop-value-2%} > {@cs}:
+                    set {_return::cs} to true
+                    set {_return::cs::%loop-value-2%} to {_sum::%loop-value-2%}
+        
+        delete {_sum::*}
+        delete {_rep::*}
+    delete {_cap}
+    delete {_w::*}
+    delete {_words::*}
+
+
+    # Repeated sentences
+    set {_count} to 1
+    set {_a::*} to split {_m} at ""
+    loop yaml list "chat.history" from {_file}:
+        set {_b::*} to split "%loop-val%" at ""
+        
+        set {_pos} to 0
+        loop {_a::*}:
+            loop-value-2 is {_b::%loop-index-2%}
+            set {_pos} to {_pos} + 1
+        if {_pos} / size of {_a::*} * 100 > {@s}:
+            set {_return::s} to true
+            set {_return::s::1} to {_pos} / size of {_a::*} * 100
+        send "&7%{_pos} / size of {_a::*}%" to {_p} if {_p} has permission "debug"
+
+        set {_count} to {_count} + 1
+        if {_count} - 1 >= {@sc}:
+            delete yaml index 1 in list "chat.history" from {_file}
+    
+    add {_m} to yaml list "chat.history" from {_file}
+    save yaml {_file}
