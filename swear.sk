@@ -165,3 +165,40 @@ command /swear [<text>] [<text>]:
 
 
             else if player has permissions "op":
+                #NOTE: LIST COMMAND - lists "swear.words" variables
+                if arg 1 is "devlist":
+                    readDoc("swear-doc", "swearlistdev", player, "swear devlist", arg 2)
+
+
+                #NOTE: RELOAD COMMAND
+                else if arg 1 is "reload":
+                    unload yaml "swear"
+                    load yaml "plugins/Skript/yaml/swear.yml" as "swear"
+                    swearList()
+
+                    loop {doc::*}:
+                        send "&7%loop-index%: %loop-value%"
+                    delete {doc::*}
+
+                    send "&aReloaded Swear!"
+            else:
+                send {sys::error}
+            
+
+        #NOTE: INAVLID COMMAND
+        else:
+            send {sys::error}
+
+
+on tab complete of "/swear":
+    player has permissions "staff"
+    set tab completions for position 1 to "help", "check", "list"
+    player has permission "op"
+    add "devlist", "reload" to tab completions
+
+
+
+#TODO: Incomplete commands remake
+# &cUnknown or incomplete command, see below for error
+# ...wear check&c<--[HERE] (10 text preview)
+# ...sh reasons&c<--[HERE]
