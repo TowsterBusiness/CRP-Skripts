@@ -76,3 +76,92 @@ function swearCheck(p: player, t: text):
             set metadata value "msg" of {_p} to {_t} # Message
  
             stop loop
+
+            #==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           EVENTS
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+
+on chat:
+    {@package} is false
+    clear metadata value "swearWRD" of player
+    swearCheck(player, message)
+    if metadata value "swearWRD" of player is set:
+        set {_s::*} to snitch("notify.swear.attempt")
+        set {_cat} to metadata value "swearCAT" of player
+        set {_wrd} to metadata value "swearWRD" of player
+
+        set {_prev} to message
+        set {_prev} to "|%first {@prev} characters of {_prev}%...$h%message%|" if length of message > {@prev}
+        tellraw("&c⚠ &7Msg blocked &f%player% &7for &c%{_cat}% &7found &c%{_wrd}% &7in &f%{_prev}%", {_s::*})
+        tellraw(yaml value "message.%{_cat}%" of "swear", player)
+        send " "
+        
+        log "%now% %player%: %{_cat}% %{_wrd}% > %message%" to "filter.log"
+        cancel event
+
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           COMMAND
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+
+command /swear [<text>] [<text>]:
+    description: player reports any false positives made by swear filter
+    usage: /swear report
+    executable by: players
+    #cooldown: 1 seconds
+    #cooldown message: &cPlease wait before you execute that command!
+    trigger:
+        
+
+    #NOTE: REPORT COMMAND - writes .log
+    if arg 1 is "report":
+        if metadata value "swearWRD" of player is set:
+            set {_d::*} to snitch("notify.swear.debug")
+            set {_wrd} to metadata value "swearWRD" of player
+            set {_cat} to metadata value "swearCAT" of player
+            set {_msg} to metadata value "msg" of player
+            
+            set {_prev} to {_msg}
+            set {_prev} to "|%first {@prev} characters of {_prev}%...$h%{_msg}%|" if length of {_msg} > {@prev}
+            tellraw("&e⚡ &7 Bug Report &f%player% &7for &c%{_cat}% &7found &c%{_wrd}% &7in &f%{_prev}%", {_d::*})
+            log "%now% %player%: %{_cat}% %{_wrd}% > %{_msg}%" to "report/filter.log"
+            send "&aMessage was logged for review"
+            clear metadata value "swearWRD" of player
+        else:
+            send "&cThere is nothing to report at this moment"
+    
+
+    else if player has permissions "staff":
+            #NOTE: Help
+            if arg 1 is "help":
+                readDoc("swear", "help", player, "swear help", arg 2)
+            else if arg 1 is not set:
+                readDoc("swear", "help", player, "swear help", arg 2)
+
+
+            #NOTE: CHECK COMMAND - check phrase in swear function
+            else if arg 1 is "check":
+                if arg 2 is set:
+                    clear metadata value "swearWRD" of player
+                    swearCheck(player, arg 2)
+                    if metadata value "swearWRD" of player is set:
+                        set {_wrd} to metadata value "swearWRD" of player
+                        send "&cCannot send! Found &f%{_wrd}% &cin &f%arg 2%"
+                    else:
+                        send "&aCan send! &r&f%arg 2%"
+                else:
+                    sendError(player, "swear check")
+
+
+            #NOTE: LIST COMMAND - lists "swear.words" variables
+            else if arg 1 is "list":
+                readDoc("swear-doc", "swearlist", player, "swear list", arg 2)
+
+
+            else if player has permissions "op":
