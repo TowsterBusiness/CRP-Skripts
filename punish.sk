@@ -213,3 +213,90 @@ function punish(p1: player, p2: offline player, cat: text, reason: text, warn: t
 
 #function punish(p: player, act: text):
 #    send {_act} to {_p}
+
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           COMMAND
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+
+#PUNISH
+command /punish [<text>] [<text>] [<text>]:
+    permission: staff
+    permission message: &cYou do not haver permissions to perform this command!
+    trigger:
+
+        #NOTE: HELP COMMAND
+        if arg 1 is "help":
+            readDoc("punish", "help", player, "punish help", arg 2)
+        else if arg 1 is not set:
+            readDoc("punish", "help", player, "punish help", arg 2)
+
+
+        #NOTE: PUNISH PLAYER
+        else if offline players contains arg 1:
+            if arg 2 is set:
+                set {_p} to player(arg 1)
+                punish(player, {_p}, arg 2, arg 3)
+            else:
+                sendError(player, "punish %arg 1%")
+
+
+        #NOTE: REASONS
+        else if arg 1 is "list":
+            readDoc("punish-doc", "reason", player, "punish list", arg 2)
+
+
+        #NOTE: RELOAD COMMAND
+        else if arg 1 is "reload":
+            if player has permissions "op":
+                unload yaml "punish"
+                load yaml "plugins/Skript/yaml/punish.yml" as "punish"
+
+                deleteDoc("punish-doc")
+                punishHelp()
+
+                loop {doc::*}:
+                    send "&7%loop-index%: %loop-value%"
+                delete {doc::*}
+
+                send "&aReloaded Punish!"
+            else:
+                send {sys::perms}
+        
+        #NOTE: INVALID COMMAND
+        else:
+            send {sys::error}
+
+
+#PUNISH TAB COMPLETE
+on tab complete of "/punish":
+    set tab completions for position 1 to "help", "list", "reload", all players
+
+    tab arg-1 is set
+    loop yaml node keys "punish" of "punish":
+        add loop-val to {_r::*} 
+    set tab completions for position 2 to {_r::*}
+        
+    #clear tab completions
+
+
+#WARN
+# command /warn [<player>] [<text>] [<text>]:
+#     permission: staff
+#     permission message: &cYou do not haver permissions to perform this command!
+#     trigger:
+#         send "beta"
+
+
+# #DETENTION
+# command /detention [<player>] [<text>] [<text>]:
+#     permission: faculty
+#     permission message: &cYou do not haver permissions to perform this command!
+#     trigger:
+#         send "beta"
+
+
+#FREEZE
