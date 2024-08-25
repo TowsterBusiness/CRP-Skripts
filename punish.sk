@@ -1,0 +1,63 @@
+#TODO: Tolerance for spamming & swearing
+
+
+
+
+#TODO: REASONS
+# Chat
+# Action / Behavior
+# Exploit / Hack -ing
+# Item
+# Character / Player
+
+#TODO: ACTION RANKING
+# 4 - Permban
+# 3 - Tempban
+# 2 - Mute
+# 1 - Detention
+# 0 - Warn
+
+#TODO: ACTION RATIO
+# 100% - Perm
+# 
+#
+
+#Punishments
+# Detention 0-15m
+# Mute 0-30m
+# Tempban 1-12h
+# Tempban 1-3d
+#NOTE: Stack punishments
+
+#Database - p@.*
+# player::@punished::<cat>::<punish>.<len> -> time | reason
+# staff::@staff::<cat>::<punish>.<len> -> time | reason
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           PUNISH
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+#options:
+    #TODO: Tolerances
+
+on Skript start:
+    wait 5 ticks
+    load yaml "plugins/Skript/yaml/punish.yml" as "punish"
+
+    punishHelp()
+    delete {doc::*}
+    
+on chat:
+    set {_now} to unix timestamp of now
+    set {_len} to metadata value "mute" of player
+    if {_now} > {_len}:
+        clear metadata value "mute" of player
+
+    # Muted
+    metadata value "mute" of player is set
+    set {_len} to {_len} - {_now}
+    set {_time} to "%{_len}% seconds" parsed as timespan
+    send "&cYou are currently muted for &7%{_time}%"
+    cancel event
