@@ -115,3 +115,46 @@ function spam(m: text, p: player):
     
     add {_m} to yaml list "chat.history" from {_file}
     save yaml {_file}
+
+
+    #NOTE: MESSAGE
+    set {_check::t} to "&ctyping too fast"
+    set {_check::w} to "&cword spam"
+    set {_check::wl} to "&cword too long"
+    set {_check::cs} to "&ccharacter spam"
+    set {_check::cr} to "&ccharacter spam"
+    set {_check::cw} to "&ccaps"
+    set {_check::s} to "&crepeating message"
+    loop {_return::*}:
+        #DEBUG: send loop-index-1 to {_p}
+        if {_check::%loop-index-1%} is set:
+            add {_check::%loop-index-1%} to {_flag::*}
+        
+        #-DEBUG-
+        loop {_return::%loop-index-1%::*}:
+            send "&7%loop-index-1%: %loop-value-2%" to {_p} if {_p} has permission "debug"
+
+
+    if {_flag::*} is set:
+        
+        set {_s::*} to snitch("staff")
+        if size of {_flag::*} > 1:
+            set {_flag} to "|&cmany reasons$$h&c%join {_flag::*} with delimiter ", "%|"
+        else:
+            set {_flag} to last element of {_flag::*}
+        if length of {_m} > {@prev}:
+            set {_prev} to "|%first {@prev} characters of {_m}%...$$h%{_m}%|"
+        else:
+            set {_prev} to {_m}
+        tellraw("&c⚠ &7Msg blocked &f%{_p}% &7for &cSpamming &7by &c%{_flag}% &7in &f%{_prev}%",{_s::*})
+        send "&cMessage blocked for spam" to {_p}
+        send " " to {_p}
+        log "%now% %{_p}%: %{_flag}% >> %{_m}%" to "spam.log"
+    delete {_flag::*}
+    delete {_return::*}
+
+
+    set metadata value "msg" of {_p} to unix timestamp of now
+    set metadata value "spamTime" of {_p} to unix timestamp of now
+
+#TODO: Ratio for similair messages, if too many words are alike to current message then flag: " " or * * should be resolved
