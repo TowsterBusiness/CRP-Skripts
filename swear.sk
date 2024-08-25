@@ -1,0 +1,49 @@
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           SWEAR DETECTION
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+options:
+    package: false #set true if dependant on a chat system
+    prev: 30
+
+on Skript start:
+    wait 5 ticks
+    load yaml "plugins/Skript/yaml/swear.yml" as "swear"
+
+    swearList()
+    delete {doc::*}
+
+
+on quit:
+    clear metadata value "swearWRD" of player
+    clear metadata value "swearCAT" of player
+    clear metadata value "msg" of player
+
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           Functions
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+#TODO: Add first letter indexes to loop through
+#TODO: Replace swear word with ****
+
+
+function swearList():
+    set {_f} to "swear-doc"
+    set {_d1} to "swearlist"
+    set {_d2} to "swearlistdev"
+    set {_h} to "head"
+    set {_h2} to "subhead"
+    set {_b} to "body"
+    deleteDoc("swear-doc")
+    loop yaml node keys "words" from "swear":
+        set {_count} to {_count} + 1
+    createDoc({_f}, {_d1}, {_h}, "&4&m------------------------------")
+    createDoc({_f}, {_d1}, {_h}, "&c&lSwear List &7[%{_count}%]")
+    createDoc({_f}, {_d1}, {_h}, " ")
+    createDoc({_f}, {_d2}, {_h}, "&4&m------------------------------")
+    createDoc({_f}, {_d2}, {_h}, "&c&lSwear &e&lDevList &7[%{_count}%]")
