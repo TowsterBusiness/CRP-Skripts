@@ -69,3 +69,64 @@ function sendError(p: player, t: text):
         set {_t} to "...%{_t}%"
     send "&cUknown or incomplete command, see below for error" to {_p}
     send "&7%{_t}%&c<--[HERE]" to {_p}
+
+    
+
+#REPLACE - Regex replace
+function regexReplace(t: text, r: text, j: text) :: text:
+    set {_t::*} to regex split {_t} at {_r}
+    set {_t} to join {_t::*} with delimiter {_j}
+    return {_t}
+
+
+#TELLRAW - tellraw json builder
+function tellraw(t: text, p: objects = "none") :: text:
+    set {_m::t} to ",{""text"":"""
+    set {_m::t::1} to """"
+    set {_m::k} to ",{""keybind"":"""
+    set {_m::k::1} to """"
+    set {_m::o} to ",""clickEvent"":{""action"":""open_url"",""value"":"""
+    set {_m::o::1} to """}"
+    set {_m::r} to ",""clickEvent"":{""action"":""run_command"",""value"":"""
+    set {_m::r::1} to """}"
+    set {_m::s} to ",""clickEvent"":{""action"":""suggest_command"",""value"":"""
+    set {_m::s::1} to """}"
+    set {_m::c} to ",""clickEvent"":{""action"":""copy_to_clipboard"",""value"":"""
+    set {_m::c::1} to """}"
+    set {_m::h} to ",""hoverEvent"":{""action"":""show_text"",""contents"":["""
+    set {_m::h::1} to """]}"
+
+    #replace """" in {_t} with "\""\"""
+    
+    set {_x::*} to regex split {_t} at "(?<!\\)\|"
+
+    
+    add "[""""" to {_tellraw::*}
+    loop {_x::*}:
+        if loop-value-1 is not "":
+        
+            set {_z} to loop-value-1
+            set {_z} to regexReplace({_z}, "(?<!\\)\$", "$⁎")
+            set {_y::*} to regex split {_z} at "(?<!\\)\$"
+            
+            loop {_y::*}:
+                #send loop-value-2 to all players #DEBUG
+                set {_z} to loop-value-2
+                replace "&" in {_z} with "§"
+                replace "\|" in {_z} with "|"
+                replace "\$" in {_z} with "$"
+                
+                if first character of {_z} is "⁎":
+                    set {_i} to subtext of {_z} from characters 2 to 2
+                    set {_z} to subtext of {_z} from characters 3 to (length of {_z})
+
+                    if {_m::%{_i}%} is set:
+                        add "%{_m::%{_i}%}%%{_z}%%{_m::%{_i}%::1}%" to {_tellraw::*}
+                else:
+                    add ",{""text"":""%{_z}%""" to {_tellraw::*}
+
+                profiler("tellraw", "loop")
+            #add ","""":""""}" to {_tellraw::*}
+            add "}" to {_tellraw::*}
+    add ",""""]" to {_tellraw::*}
+    set {_tellraw} to join {_tellraw::*} with delimiter ""
