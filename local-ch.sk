@@ -62,3 +62,57 @@ on join:
     set {channel::local::%player's uuid%} to true
     set {channel::local::%player's uuid%::%{_id}%} to "%player's uuid% 1"
 
+
+on Skript start:
+    set {channel::local} to true
+    set {channel::local.id} to true
+    set {channel::available.id} to true
+
+
+on Skript stop:
+    delete {channel::*}
+
+
+on join:
+    #NOTE: TRACKER
+    set {_sizeId} to size of {channel::local.id::*}
+    #Scan Available ID
+    loop {channel::available.id::*}:
+        set {_id} to loop-index
+        delete {channel::available.id::%{_id}%}
+        stop loop
+    if {_id} is not set:
+        #Next New ID
+        if {_sizeId} is set:
+            set {_id} to {_sizeId} + 1
+        #Default ID
+        else:
+            set {_id} to 1
+    
+    set {channel::local.id::%player's uuid%} to {_id}
+    send "[CH] Connected %player% of %player's uuid% to Local:%{_id}%" to console
+
+    #NOTE: LOCAL WALLET - store contacts
+    set {channel::local::%player's uuid%} to true
+    set {channel::local::%player's uuid%::%{_id}%} to "%player's uuid% 1"
+
+
+on leave:
+    #AVAILABLE ID
+    set {_id} to {channel::local.id::%player's uuid%}
+    set {channel::available.id::%{_id}%} to true
+    send "[CH] Disconnected %player% of %player's uuid% from Local:%{_id}%" to console
+    #CLEANUP
+    delete {channel::local::%player's uuid%::*}
+    delete {channel::local.id::%player's uuid%}
+
+
+#FIXME: Sometimes player loses own business card / persistance failed
+on chat:
+    remove all players from chat recipients
+    #NOTE: Flushing - reloading wallet
+    loop {channel::local::%player's uuid%::*}:
+        set {_w::*} to loop-value split at " "
+        if {_w::2} parsed as integer is 1:
+            set {_wallet::%loop-index%} to "%{_w::1}% 1" 
+    set {channel::local::%player's uuid%::*} to {_wallet::*}
