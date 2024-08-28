@@ -206,4 +206,73 @@ on rightclick on dark oak door:
     # if event-block closed stop loop remove from list
     # outside event on every 5 seconds check check list timestamp, if expired stop loop remove from list 
     # if event-block is open add to list 
+on every 20 seconds:
+    loop yaml node keys "check" from "dorm":
+        set {_owner} to yaml value "door.%loop-val%" from "dorm"
+        set {_block} to yaml value "room.%{_owner}%.door" from "dorm"
+        set blockdata tag "open" of {_block} to false
+        play sound "block.wooden_door.close" at {_block}
+        delete yaml value "check.%loop-val%" from "dorm"
+        delete {doorCheck::%{_owner}%::*}
+        broadcast {_block}
+        broadcast "&cClosed %loop-val%"
     
+
+
+
+
+    # PERMISSION
+    
+
+
+
+function doorAllow(p: player, xyz: text) :: boolean:
+    set {_owner} to yaml value "door.%{_xyz}%" from "dorm"
+    set {_status} to yaml value "room.%{_owner}%.status" from "dorm"
+    set {_invite} to yaml value "dorm.invite.%{_p}'s uuid%" from "player/%{_owner}%"
+    # blacklisted
+    if {_invite} is false:
+        send "&cYou are not allowed to enter!" to {_p}
+        set {_pass} to false
+    # public room
+    else if {_status} is "public":
+        set {_pass} to true
+    # invited
+    else if {_invite} is true:
+        set {_pass} to true
+    # private room
+    else if {_status} is "private":
+        send "&cThis room is private!" to {_p}
+        set {_pass} to false
+    return {_pass}
+
+
+
+#TODO: Staff remove players
+
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           COMMAND
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+command /dorm [<text>] [<text>]:
+    trigger:
+        #NOTE: HELP COMMAND
+        if arg 1 is "help":
+            send ""
+        else if arg 1 is not set:
+            send ""
+
+        yaml value "room.%player's uuid%" from "dorm" is set
+        set {_sign} to yaml value "room.%player's uuid%.sign" from "dorm"
+        set {_door} to yaml value "room.%player's uuid%.door" from "dorm"
+        set {_door} to location of {_door}
+        #NOTE: INVITED | WHITELIST
+        if arg 1 is "invite":
+            players contains arg 2
+            set {_target} to player(arg 2)
+            set yaml value "dorm.invite.%{_target}'s uuid%" from "player/%player's uuid%" to true
+            send "&aInvited %{_target}'s displayname% &ato your room"
+            send "&aInvite from %player% to %line 2 of {_sign}%" to {_target}
