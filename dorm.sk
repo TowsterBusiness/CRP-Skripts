@@ -137,3 +137,73 @@ function stringLocation(l: Location) :: string:
     replace all "." with "" in {_xyz}
     return {_xyz}
 
+
+on rightclick on dark oak door:
+    # check door is owned
+    set {_xyz} to stringLocation(event-block)
+    if yaml value "door.%{_xyz}%" from "dorm" is not set:
+        set {_xyz} to stringLocation(location of event-block offset by vector(0, -1, 0))
+    set {_owner} to yaml value "door.%{_xyz}%" from "dorm"
+    set {_block} to yaml value "room.%{_owner}%.door" from "dorm"
+
+    {_owner} is set
+
+    send {_xyz}
+    send {_block}
+
+    # check player is allowed in
+    set {_allow} to doorAllow(player, {_xyz})
+    {_allow} is set
+    if {_allow} is false:
+        cancel event
+
+    # door is currently closed but after is opened
+    {_allow} is true
+    if block data tag "open" of {_block} is true:
+        delete yaml value "check.%{_xyz}%" from "dorm"
+    
+    block data tag "open" of {_block} is false
+    send "&aClosed -> Open"
+
+    yaml value "check.%{_xyz}%" from "dorm" is not set
+    set yaml value "check.%{_xyz}%" from "dorm" to true
+
+    set {doorCheck::%{owner}%} to true
+    while yaml value "check.%{_xyz}%" from "dorm" is set:
+        loop all players within 1 blocks of {_block}:
+            if {doorCheck::%{owner}%::%loop-player's uuid%} is false:
+                teleport loop-player to block in front {_block}
+                exit
+
+            # transition - welcomed players
+            if doorAllow(loop-player, {_xyz}) is true:
+                set {doorCheck::%{owner}%::%loop-player's uuid%} to true
+                yaml value "room.%{_owner}%.guest.%player's uuid%" from "dorm" is true
+                delete yaml value "room.%{_owner}%.guest.%player's uuid%" from "dorm"
+            # denied 
+            else:
+                set {doorCheck::%{_owner}%::%loop-player's uuid%} to false
+                teleport loop-player to location of block in front {_block} offset by vector(0, -0.5, 0)
+                send "&cDenied: %player's uuid%"
+            wait 1 tick
+
+        # loop all players at 1 block behind {_block}:
+        #     # add to guest list
+        #     if {doorCheck::%loop-player uuid%} is true:
+        #         set yaml value "room.%{_owner}%.guest.%player's uuid%" from "dorm" to true
+        #         send "&aAllowed: %player's uuid%"
+        #     # denied again
+        #     else:
+        #         teleport loop-player to block in front {_block}
+
+        wait 1 ticks
+
+        # if 1 block behind and is allowed, add to guest
+        # if 1 block infront and is guest, remove from guest
+        # if between infront and in block check doorAllow()
+        
+
+    # if event-block closed stop loop remove from list
+    # outside event on every 5 seconds check check list timestamp, if expired stop loop remove from list 
+    # if event-block is open add to list 
+    
