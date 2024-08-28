@@ -1,0 +1,81 @@
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           DOCUMENT
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+options:
+    length: 10
+    dir: "plugins/Skript/yaml/"
+
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           FUNCTION
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+#ROUND UP
+function roundUp(n: number) :: number:
+    set {_round} to round({_n})
+    if {_n} > {_round}:
+        set {_n} to {_round} + 1
+    else:
+        set {_n} to {_round}
+    return {_n}
+
+
+#YAML LOAD
+function yamlLoad(file: text):
+    set {_dir} to "%{@dir}%%{_file}%.yml"
+    if yaml {_file} is not loaded:
+        load yaml {_dir} as {_file}
+
+
+#YAML LENGTH
+function yamlLen(file: text, path: text) :: number:
+    yamlLoad({_file})
+    loop yaml node keys {_path} from {_file}:
+        set {_c} to {_c} + 1
+    return {_c}
+
+
+#DELETE DOCUMENT
+function deleteDoc(file: text):
+    yamlLoad({_file})
+    delete yaml {_file}
+
+
+#CREATE DOCUMENT - File, Document, Category, Text, Referenced Category (will set len of ref index to Category)
+function createDoc(file: text, doc: text, c: text, t: text, r: text = false) :: objects:
+    yamlLoad({_file})
+
+    if {_r} is "false":
+        set {_r} to {_c}
+    if yaml path "%{_doc}%.%{_r}%" in {_file} exists:
+        set {_i} to yamlLen({_file}, "%{_doc}%.%{_r}%") + 1
+    else:
+        set {_i} to 1
+
+    set yaml value "%{_doc}%.%{_c}%.%{_i}%" from {_file} to {_t}
+
+    #REPORTING
+    set {doc::%{_doc}%.%{_c}%} to yamlLen({_file}, "%{_doc}%.%{_c}%")
+    
+
+#TODO: Create "trash collection"
+
+
+#READ DOCUMENT
+function readDoc(file: text, doc: text, p: player, cmd: text, page: text = "1"):
+    yamlLoad({_file})
+    
+
+    if {_page} is not set:
+        set {_page} to "1"
+    set {_page} to {_page} parsed as number
+    #HEAD
+    loop yaml node keys "%{_doc}%.head" from {_file}:
+        set {_count} to {_count} + 1
+        tellraw(yaml value "%{_doc}%.head.%loop-val%" from {_file}, {_p})
+    set {_length} to {@length} - {_count}
