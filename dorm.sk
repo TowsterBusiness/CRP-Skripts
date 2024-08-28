@@ -1,0 +1,37 @@
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           Dorm
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+options:
+    dir: "plugins/Skript/yaml/"
+
+on Skript start:
+    wait 5 ticks
+    load yaml "plugins/Skript/yaml/dorm.yml" as "dorm"
+
+
+on quit:
+    wait 3 minutes
+    player is offline
+    set {_sign} to yaml value "room.%player's uuid%.sign" from "dorm"
+    set {_door} to yaml value "room.%player's uuid%.door" from "dorm"
+    set {_door} to stringLocation(location of {_door})
+    set line 3 of {_sign} to ""
+    set line 4 of {_sign} to ""
+
+    delete yaml value "room.%player's uuid%" from "dorm"
+    delete yaml value "door.%{_door}%" from "dorm"
+
+
+# on Skript stop:
+#     loop {dorm::room::*}:
+#         set {_sign} to {dorm::room::%loop-index%::sign}
+#         set line 3 of {_sign} to ""
+#         set line 4 of {_sign} to ""
+#         wait 2 ticks
+
+#     # delete yaml value "room" from "dorm"
+#     # delete yaml value "door" from "dorm"
+            
