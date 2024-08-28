@@ -62,3 +62,25 @@ function readDoc(name: text, cmd: text, p: player, page: text):
     #NOTE: HEADER
     loop {doc::%{_name}%.head::*}:
         send loop-value to {_p}
+
+    #NOTE: BODY
+    loop {doc::%{_name}%.body::*}:
+        set {_line} to {_line} + 1
+        
+        send {doc::%{_name}%.body::%{_line}%} to {_p}
+        #DEBUG: send "&7Body %{_line}%" to {_p}
+
+        #NOTE: PAGE
+        if {_line} is {_max}:
+            send " " to {_p}
+            if {_page} is 1:
+                set {_tellraw} to "/tellraw %{_p}% ["""","" Page [%{_page}%/%{_pagemax}%]"",{""text"":"" ▶"",""clickEvent"":{""action"":""run_command"",""value"":""/%{_cmd}% %{_next}%""}}]"
+            else if {_page} >= {_pagemax}:
+                set {_tellraw} to "/tellraw %{_p}% ["""",{""text"":""◀ "",""clickEvent"":{""action"":""run_command"",""value"":""/%{_cmd}% %{_back}% ""}},""Page [%{_page}%/%{_pagemax}%]""]"
+            else if {_page} > 1:
+                set {_tellraw} to "/tellraw %{_p}% ["""",{""text"":""◀ "",""clickEvent"":{""action"":""run_command"",""value"":""/%{_cmd}% %{_back}% ""}},""Page [%{_page}%/%{_pagemax}%]"",{""text"":"" ▶"",""clickEvent"":{""action"":""run_command"",""value"":""/%{_cmd}% %{_next}%""}}]"
+            execute console command "%{_tellraw}%"
+            stop loop
+    send " " to {_p}
+
+#TODO: Add Tellraw Hover, Command, Sub Page Creator
