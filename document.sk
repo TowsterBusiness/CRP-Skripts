@@ -79,3 +79,88 @@ function readDoc(file: text, doc: text, p: player, cmd: text, page: text = "1"):
         set {_count} to {_count} + 1
         tellraw(yaml value "%{_doc}%.head.%loop-val%" from {_file}, {_p})
     set {_length} to {@length} - {_count}
+
+    #SUBHEAD
+    if yaml path "%{_doc}%.subhead" in {_file} exists:
+        set {_count} to {_count} + 1
+        set {_length} to {_length} - 1
+        loop yaml node keys "%{_doc}%.subhead" from {_file}:
+            set {_next} to loop-node parsed as number
+            set {_comp} to {_next} - {_prev}
+            
+            #send "%{_next}%&7-&r%{_prev}%&7=&r%{_comp}%&7>&r%{_length}%" to all players
+            if {_comp} > {_length}: # If body content is greater than length then it creates more subpages
+                set {_comp} to {_comp} - {_length}
+                set {_x} to roundUp({_comp} / {_length})
+                loop {_x} times:
+                    set {_y} to {_y} + 1
+                    set {_z} to {_length} * {_y} + {_prev}
+                    add {_z} to {_page::*}
+                    add {_prev} to {_subhead::*}
+                    profiler("document", "loop")
+                profiler("document", "loop")
+                    #broadcast "&7%{_length}%*%{_y}%+%{_prev}%= %{_z}%: %{_prev}%"
+                #send "&7comp: %{_comp}%" to all players
+                #send "&7length: %{_length}%" to all players
+            delete {_y}
+            add loop-val to {_subhead::*}
+            add loop-node parsed as number to {_page::*}
+            #broadcast "%loop-node%: %loop-val%"
+
+            set {_prev} to loop-node parsed as number
+        set {_page} to size of {_page::*} if {_subhead::%{_page}%} is not set # Overmax page limiter
+
+        profiler("document", "profile", "stop")
+        #SUBHEAD MSG
+        set {_x} to yaml value "%{_doc}%.subhead.%{_subhead::%{_page}%}%" from {_file}
+        tellraw({_x}, {_p})
+
+        #INDEX
+        #broadcast {_page::*}
+        set {_index} to {_page::%{_page}%}
+        set {_max} to {_page::%{_page} + 1%}
+        set {_max} to {_index} + {_length} if {_max} is not set # Max returns none (no next subheading)
+        set {_last} to size of {_page::*}
+        set {_filler} to {_index} + {_length} - {_max}
+    else:
+        loop yaml node keys "%{_doc}%.body" from {_file}:
+            set {_page::1} to loop-val
+        set {_last} to roundUp({_page::1} parsed as number / {_length})
+        set {_page} to {_last} if {_page} > {_last} # Overmax page limiter
+        set {_max} to {_page} * {_length}
+        set {_index} to {_max} - {_length} + 1
+        set {_filler} to {_index} + {_length} - {_max} - 1
+    #broadcast "%{_index}%+%{_length}%-%{_max}%-1= %{_filler}%"
+
+    
+    #----DEBUG-----#
+    set {_d} to {_p} if {_p} has permission "debug"
+    send " " to {_d}
+    send "&7Size: %{_length}%" to {_d}
+    send "&7Page: %{_page}%/%{_last}%" to {_d}
+    send "&7List: %{_index}%/%{_filler}%/%{_max}%" to {_d}
+    send "&7Path: %{_doc}%.body.%{_index}%" to {_d}
+    send " " to {_d}
+    
+
+    #BODY
+    loop {_length} times:
+        set {_b} to yaml value "%{_doc}%.body.%{_index}%" from {_file}
+        tellraw({_b}, {_p}) if {_d} is not set
+        tellraw("&7%{_index}% &r%{_b}%", {_d}) #DEBUG
+        set {_index} to {_index} + 1
+        if {_index} is {_max}:
+            stop loop
+    loop {_filler} times:
+        send "" to {_p}
+
+
+    #NAV
+    if {_last} > 1:
+        if {_page} > 1:
+            add "|◀$r/%{_cmd}% %{_page} - 1%| " to {_nav::*}
+        add "Page [%{_page}%/%{_last}%]" to {_nav::*}
+        if {_page} < {_last}:
+            add "| ▶$r/%{_cmd}% %{_page} + 1%|" to {_nav::*}
+        set {_nav} to join {_nav::*} with delimiter ""
+        tellraw("\n%{_nav}%\n",{_p})
