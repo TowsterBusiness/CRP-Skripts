@@ -130,3 +130,133 @@ function tellraw(t: text, p: objects = "none") :: text:
             add "}" to {_tellraw::*}
     add ",""""]" to {_tellraw::*}
     set {_tellraw} to join {_tellraw::*} with delimiter ""
+
+    profiler("tellraw", "profile", "stop")
+    if {_p} is not "none":
+        #console command "/tellraw %{_p}% %{_tellraw}%"
+        loop {_p::*}:
+            console command "/tellraw %loop-value-1% %{_tellraw}%"
+
+    return {_tellraw}
+
+
+    #spaming |many reasons$$hHello| in hihihihihi
+    #if this is mistake, |click here$$|
+    #$t - text
+    #$k - keybind
+    #$u - open url
+    #$r - run command
+    #$s - suggest command
+    #$c - copy to clipboard
+    #$h - hover text
+
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           COMMAND
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+
+#DEBUG - reports time command 
+command /debug [<text>]:
+    permission: op
+    trigger:
+        set {_startTime} to unix timestamp of now
+
+        make player execute command arg 1
+
+        set {_endTime} to unix timestamp of now
+        set {_Time} to {_endTime} - {_startTime}
+        if {_Time} > {@benchmark}:
+            send "&7Taken &c%{_Time}% &7seconds"
+        else if {_Time} <= {@benchmark}:
+            send "&7Taken &a%{_Time}% &7seconds"
+
+
+#REGEX - matches given regex
+command /regex [<text>] [<text>] [<text>]:
+    description: devtool regex
+    permission: op
+    permission message: &cYou do not haver permissions to perform this command!
+    trigger:
+
+        #NOTE: REGEX
+        arg 2 is set
+        arg 3 is set
+        if arg 1 is "match":
+            if arg 3 matches arg 2:
+                send "&e&lRegEx> &aMatched! &r%arg 2%"
+            else:
+                send "&e&lRegEx> &cNot Matched! &r%arg 2%"
+        else if arg 1 is "split":
+            send "&ctest"
+
+
+#COLOR - Colored Messages
+command /color [<text>]:
+    description: devtool text color coding
+    permission: staff
+    permission message: &cYou do not haver permissions to perform this command!
+    trigger:
+        if arg 1 is set:
+            set {_t} to arg 1
+            replace "&" in {_t} with "§"
+            send {_t}
+        else:
+            send "&c=================================="
+            send "& 0 = §0Black              &f& 1 = §1Dark Blue"
+            send "& 2 = §2Dark Green      &f& 3 = §3Dark Aqua"
+            send "& 4 = §4Dark Red         &f& 5 = §5Dark Purple"
+            send "& 6 = §6Gold               &f& 7 = §7Gray"
+            send "& 8 = §8Dark Gray       &f& 9 = §9Blue"
+            send "& a = §aGreen            &f& b = §bAqua"
+            send "& c = §cRed               &f& d = §dLight Purple"
+            send "& e = §eYellow            &f& f = §fWhite"
+            send "&c=================================="
+            send "& k = §k123               &f& l = §lBold"
+            send "& m = §mStrikethrough&r  &f& n = §nUnderline"
+            send "& o = §oItalics           &f& r = §rReset"
+            send " "
+
+
+#SNITCH - Print all players with perms
+command /snitch [<text>]:
+    description: devtool function snitch
+    permission: op
+    permission message: &cYou do not haver permissions to perform this command!
+    trigger:
+        if arg 1 is set:
+            set {_r::*} to snitch(arg 1)
+            send "&7Found: &c%{_r::*}%"
+
+
+#TELLRAW
+command /tellrawx [<text>]:
+    description: Easy tellraw testing
+    permission: op
+    permission message: &cYou do not haver permissions to perform this command!
+    trigger:
+        if arg 1 is set:
+            set {_t} to tellraw(arg 1, player)
+            send "&7%unformatted {_t}%"
+
+
+#COPY - Copies mainhand item
+command /copy:
+    permission: staff
+    trigger:
+        set {_nbt} to nbt compound of nbt of player's tool
+        send {_nbt}
+        if {_nbt} is "{serverBinding:1b}":
+            send "&cThis item cannot be copied!"
+        else:
+            give player's tool to player
+        
+#HEAD - mc-heads db
+command /head [<text>]:
+    permission: staff
+    trigger:
+        if arg 1 is set:
+            console command "give %player% minecraft:player_head{display:{Name:""{\""text\"":\""Skull Head\""}""},SkullOwner:{Id:[I;754602255,-947633604,-1613584887,-1061790114],Properties:{textures:[{Value:""%arg 1%""}]}}} 1"
+
