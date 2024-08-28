@@ -1,0 +1,45 @@
+command /test [<text>]:
+    trigger:
+
+        #if arg 1 is "help":
+        #    send "Help"
+        #else if all players contain arg 1:
+        #    send arg 1
+
+        #arg 1 is "help"
+        #send "Help"
+        #arg 1 is "Test"
+        #send "test"
+
+        load yaml "plugins/Skript/yaml/test.yml" as "test"
+        set yaml value "test.test2" from "test" to "hello world"
+        #delete {test::*}
+        set {_test::*} to true
+        set {_test::3} to true
+        set {_test::10} to true
+        set yaml list "list.test" from "test" to {_test::*}
+        #test()
+        save yaml "test"
+        #delete {test::5}
+        #loop {test::*}:
+        #    send "&7%loop-index% &f%loop-value%"
+        #console command "tellraw @a ""§1TEST """
+        #send "&c⚠ &7Warning"
+        #send "&9ⓘ &7Info"
+        #send "&e⚡ &7  Debug"
+        set {_test} to yaml value "words" from "test"
+        broadcast size of yaml list "words" from "test"
+        broadcast {_test}
+        loop yaml node keys "words" from "test":
+            broadcast yaml value "words.%loop-val%" from "test"
+            #broadcast "%loop-id% - %loop-val% - %loop-list% - %loop-node% - %loop-key% - %loop-subnodekeys%"
+            #broadcast yaml value loop-node from loop-id
+        
+
+# function testAdd(t: text, n: text):
+#     set yaml value "swear.%{_n}%" from "test" to {_t}
+
+# function test():
+#     testAdd(".*[fF]+[\d|\W|_]*[uUoOvVaA0-9@*]*[\d|\W|_]*[cCwW]+[\d|\W|_]*[kK]+.*", "Fuck")
+#     testAdd(".*[bB][\d|\W|_]*[iI!lL1-9]*[\d|\W|_]*[tT]+[\d|\W|_]*[cC]+[\d|\W|_]*[hH]+.*", "Bitch")
+#     testAdd(".*[bB][\d|\W|_]*[aA@0-9]*[\d|\W|_]*[sS]+[\d|\W|_]*[tT]+[\d|\W|_]*[aA@0-9]*[rR]+[\d|\W|_]*[dD]+.*", "Bastard")
