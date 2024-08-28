@@ -1,0 +1,71 @@
+options:
+    benchmark: 0.0009999275207519531
+    prev: 10
+    dir: "plugins/Skript/yaml/"
+
+on Skript start:
+    load yaml "%{@dir}%/debug.yml" as "debug"
+    set {profiler} to false
+    set {profiler::task} to true
+    set {profiler::proc} to true
+
+on Skript stop:
+    delete {profiler::*}
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           FUNCTION
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+
+#PROFILER
+function profiler(p: text, f: text, t: text = "start"):
+    {profiler} is true
+
+    set {profiler::task::%{_p}%} to true
+    set {profiler::task::%{_p}%::%{_f}%} to {profiler::task::%{_p}%::%{_f}%} + 1
+    
+    if {_t} is "start":
+        {proc} isn't set
+        set {proc} to size of {profiler::proc::*} + 1
+
+        add {_p} to {profiler::proc::*}
+        set {profiler::proc::%{proc}%::1} to unix timestamp of now
+    else if {_t} is "stop":
+        set {profiler::proc::%{proc}%::1} to unix timestamp of now - {profiler::proc::%{proc}%::1}
+        delete {proc}
+        
+        
+
+#SNITCH - Gathers players permission to a list
+function snitch(p: text) :: objects:
+    if first 1 character of {_p} is "!":
+        loop all players:
+            add loop-player to {_return::*} if loop-player doesn't have permission "%{_p}%"
+
+            profiler("snitch", "loop")
+    else:
+        loop all players:
+            add loop-player to {_return::*} if loop-player has permission "%{_p}%"
+
+            profiler("snitch", "loop")
+    profiler("snitch", "profile", "stop")
+    return {_return::*}
+
+
+#PLAYER - Parses text as player
+function player(p: text) :: offline player:
+    loop all offline players:
+        loop-offline player is {_p}
+        return loop-offline player
+        stop loop
+
+
+#ERROR - Reports error @ position
+function sendError(p: player, t: text):
+    if length of {_t} > {@prev}:
+        set {_t} to subtext of {_t} from characters (length of {_t} - {@prev}) to (length of {_t})
+        set {_t} to "...%{_t}%"
+    send "&cUknown or incomplete command, see below for error" to {_p}
+    send "&7%{_t}%&c<--[HERE]" to {_p}
