@@ -97,3 +97,41 @@ command /chat [<text>] [<text>]:
 
 on tab complete of "/chat":
     set tab completions for position 1 to "help", "clear", "mute", "slow"
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           Lockdown
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+
+on Join:
+    {lockdown} is set
+    player's time played is less than 10 minutes
+    kick player due to "&cThe server has disabled new visitors, please apply to join here: &9&nhttps://forms.gle/SnV5WWbJbRyqkBED8"
+
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           COMMAND
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+
+command /lockdown:
+    permission: staff
+    trigger:
+        set {_p::*} to snitch("!staff")
+        set {_s::*} to snitch("staff")
+        if {lockdown} is not set:
+            set {lockdown} to true
+            loop all players:
+                wait 5 ticks
+                loop-player's time played is less than 10 minutes
+                kick loop-player due to "&cThe server has disabled new visitors, please apply to join here: &9&nhttps://forms.gle/SnV5WWbJbRyqkBED8"
+            send "&c⚠ Server is locked down" to {_p::*}
+            send "&c⚠ Server lock down by &r%player%" to {_s::*}
+        else:
+            send "&aServer lock down has been lifted" to {_p::*}
+            send "&aServer lock down lifted by &r%player%" to {_s::*}
+            delete {lockdown}
