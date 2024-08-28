@@ -35,3 +35,41 @@ on quit:
 #     # delete yaml value "room" from "dorm"
 #     # delete yaml value "door" from "dorm"
             
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           FUNCTION
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+
+#RESERVE
+on rightclick on sign:
+    line 2 matches "Room\s\d+"
+    set {_sign} to yaml value "room.%player's uuid%.sign" from "dorm"
+    set {_status} to yaml value "room.%player's uuid%.status" from "dorm"
+
+    #NOTE: Dorm Owner
+    # sign control
+    if location of event-block is location of {_sign}:
+        if player is sneaking:
+            make player execute command "/dorm reset"
+        else if {_status} is "private":
+            make player execute command "/dorm public"
+        else if {_status} is "public":
+            make player execute command "/dorm private"
+
+    #NOTE: Other
+    else:
+        # room already reserved
+        if line 3 is not "":
+            send "&cThis room is already reserved by &f%line 3%&c!"
+            play sound "block.anvil.land"
+        # attempt multiple reservations
+        else if yaml value "room.%player's uuid%" from "dorm" is set:
+            send "&cYou've previously reserved &r%line 2 of {_sign}%&c!"
+            play sound "block.anvil.land"
+        # dorm reservation
+        else:
+            line 3 is ""
+            dormOwner(player, event-block)
+
