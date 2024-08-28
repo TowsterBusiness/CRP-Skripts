@@ -276,3 +276,69 @@ command /dorm [<text>] [<text>]:
             set yaml value "dorm.invite.%{_target}'s uuid%" from "player/%player's uuid%" to true
             send "&aInvited %{_target}'s displayname% &ato your room"
             send "&aInvite from %player% to %line 2 of {_sign}%" to {_target}
+
+        #NOTE: UNINVITE
+        else if arg 1 is "uninvite":
+            players contains arg 2
+            set {_target} to player(arg 2)
+            delete yaml value "dorm.invite.%{_target}'s uuid%" from "player/%player's uuid%"
+            send "&cUninvited %{_target}'s displayname% &cto your room"
+        
+
+        #NOTE: BLACKLIST | BAN
+        else if arg 1 is "remove":
+            players contains arg 2
+            set {_target} to player(arg 2)
+            if {_target}'s uuid is player's uuid:
+                send "&cYou cannot remove yourself!"
+            else:
+                set yaml value "dorm.invite.%{_target}'s uuid%" from "player/%player's uuid%" to false
+                send "&cBlacklisted &r%{_target}'s displayname% &cfrom entering!"
+        
+
+        #NOTE: STATUS
+        else if arg 1 is "private":
+            set yaml value "room.%player's uuid%.status" from "dorm" to "private"
+            set line 4 of {_sign} to "&4&l[Private]"
+            # set line 2 of block 2 blocks behind {_sign} to "&c&l[Private Room]"
+            # set line 3 of block 2 blocks behind {_sign} to "Keeping Players"
+            # set line 4 oof block 2 blocks behind {_sign} to "Out"
+            send "&eDorm made &cPrivate"
+            play sound "block.lever.click" with pitch 0.5
+
+
+        #NOTE: STATUS - public
+        else if arg 1 is "public":
+            set yaml value "room.%player's uuid%.status" from "dorm" to "public"
+            set line 4 of {_sign} to "&a&l[Public]"
+            # set line 2 of block 2 blocks behind {_sign} to "&a&l[Public Rooom]"
+            # set line 3 of block 2 blocks behind {_sign} to "Allowing Players"
+            # set line 4 of block 2 blocks behind {_sign} to "In"
+            send "&eDorm made &aPublic"
+            play sound "block.lever.click" with pitch 0.6
+
+
+        #NOTE: RESET
+        else if arg 1 is "reset":
+            set line 3 of {_sign} to ""
+            set line 4 of {_sign} to ""
+            send "&cYou no longer have &r%line 2 of {_sign}%"
+            play sound "block.anvil.land" with pitch 0
+
+            delete yaml value "door.%stringLocation({_door})%" from "dorm"
+            delete yaml value "room.%player's uuid%" from "dorm"
+
+
+on tab complete of "/dorm":
+    set tab completions for position 1 to "help", "private", "public", "invite", "uninvite", "remove", "reset"
+    
+    if tab arg-1 is "invite":
+        set {_p} to true
+    else if tab arg-1 is "uninvite":
+        set {_p} to true
+    else if tab arg-1 is "remove":
+        set {_p} to true
+    {_p} is set
+    set tab completions for position 2 to all players
+
+    
