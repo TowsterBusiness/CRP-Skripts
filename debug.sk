@@ -260,3 +260,80 @@ command /head [<text>]:
         if arg 1 is set:
             console command "give %player% minecraft:player_head{display:{Name:""{\""text\"":\""Skull Head\""}""},SkullOwner:{Id:[I;754602255,-947633604,-1613584887,-1061790114],Properties:{textures:[{Value:""%arg 1%""}]}}} 1"
 
+
+#YAML CACHE
+command /yaml [<text>] [<text>] [<text>]:
+    permission: op
+    trigger:
+        if arg 1 is "list":
+            set {_r::*} to loaded yaml files
+            send "&7%{_r::*}%"
+
+        else if arg 1 is "reload":
+            unload yaml arg 2
+            load yaml arg 2
+            send "&aReloaded %arg 2%"
+        
+        else if arg 1 is "unload":
+            unload yaml arg 2
+            send "&cUnloaded %arg 2%"
+
+        else if arg 1 is "node":
+            arg 2 is set
+            yamlLoad(arg 2)
+            loop yaml node keys arg 3 from arg 2:
+                tellraw("|&7%loop-val%$s/yaml value %arg-2% %arg-3%.%loop-val%|", player)
+
+                #set {_r::*} to all yaml nodes of "%{@dir}%/%arg 2%"
+                #send {_r::*}
+        
+        else if arg 1 is "value":
+            arg 2 is set
+            yamlLoad(arg 2)
+            send "&7%yaml value arg 3 from arg 2%"
+
+on tab complete of "/yaml":
+    player has permissions "op"
+    set tab completions for position 1 to "list", "unload", "reload", "node", "value"
+    tab arg-1 is "reload" or "unload" or "node" or "value"
+    set tab completions for position 2 to loaded yaml files
+
+
+# PLAYTIME - MC Stat
+command /playtime [<offlineplayer>]:
+    trigger:
+        if arg 1 is set:
+            player has permissions "staff"
+            send "&ePlaytime of &r%arg-1% &eis &r%time played of arg-1%"
+        else:
+            send "&eYour playtime is &r%time played of player%"
+
+
+# PROFILE - Dump
+command /profile [<text>]:
+    permission: op
+    trigger:
+        if arg 1 is "dump":
+            loop {profiler::task::*}:
+                loop {profiler::task::%loop-index-1%::*}:
+                    send "&3%loop-index-1% &6%loop-value-2% &3%loop-index-2%"
+            loop {profiler::proc::*}:
+                loop {profiler::proc::%loop-index%::*}:
+                    set {_t} to "%loop-value-2% seconds" parsed as timespan
+                    send "&3%loop-value-1% &6%loop-index-1% &3taken &6%{_t}%"
+        else:
+            set {profiler} to arg 1 parsed as boolean
+            send "Profiling is set to %arg 1%"
+        delete {profiler::task::*}
+        delete {profiler::proc::*}
+
+on tab complete of "/profile":
+    player has permissions "op"
+    set tab completions for position 1 to "dump", "true", "false"
+    
+#Cusom Item Creator / Validator
+
+#Item extractor
+
+#NOTE: Tellrawx - avoiding usage of skript-json 
+#NOTE: regexReplace - avoiding usage of Tuske
