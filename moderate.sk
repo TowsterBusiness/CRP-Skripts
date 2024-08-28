@@ -1,0 +1,99 @@
+#TODO:
+# mute chat
+# slow chat
+# clear chat
+# kickall player that has less than 10 minutes of pt
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           Chat
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+on chat:
+    #NOTE: MUTE CHAT
+    if {chat::mute} is true:
+        send "&cChat disabled"
+        cancel event
+    
+    #NOTE: SLOWMODE
+    else if {chat::slow} is set:
+        set {_now} to unix timestamp of now
+        set {_len} to metadata value "slowChat" of player
+        if {_now} > {_len}:
+            clear metadata value "slowChat" of player
+        
+        if metadata value "slowChat" of player is set:
+            set {_len} to {_len} - {_now}
+            set {_time} to "%{_len}% seconds" parsed as timespan
+            send "&cYou cannot send another message until &7%{_time}%"
+            cancel event
+        else:
+            set metadata value "slowChat" of player to unix timestamp of now + {chat::slow}
+            wait "%{chat::slow}% seconds" parsed as timespan
+
+on Skript stop:
+    delete {chat::*}
+    delete {lockdown}
+
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           COMMAND
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+command /chat [<text>] [<text>]:
+    permission: staff
+    trigger:
+
+        #NOTE: HELP COMMAND
+        if arg 1 is "help":
+            readDoc("chat", "help", player, "chat help", arg 2)
+        else if arg 1 is not set:
+            readDoc("chat", "help", player, "chat help", arg 2)
+        
+        else if arg 1 is "clear":
+            set {_p::*} to snitch("!staff")
+            set {_s::*} to snitch("staff")
+            tellraw("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n&c⚠ Chat Cleared", {_p::*})
+            send "&c⚠ Chat Cleared by &r%player%" to {_s::*}
+        
+        #NOTE: MUTE CHAT
+        else if arg 1 is "mute":
+            set {_p::*} to snitch("!staff")
+            set {_s::*} to snitch("staff")
+            if {chat::mute} is not set:
+                set {chat::mute} to true
+                send "&c⚠ Chat has been disabled" to {_p::*}
+                send "&c⚠ Chat has been disabled by &r%player%" to {_s::*}
+            else:
+                send "&aChat has been enabled" to {_p::*}
+                send "&aChat has been enabled by &r%player%" to {_s::*}
+                delete {chat::mute}
+        
+        #NOTE: SLOWMODE
+        else if arg 1 is "slow":
+            set {_p::*} to snitch("!staff")
+            set {_s::*} to snitch("staff")
+            if {chat::slow} is not set:
+                set {chat::slow} to 10
+                set {chat::slow} to arg 2 parsed as number if arg 2 is set
+                send "&c⚠ Chat slow mode is &r%{chat::slow}% seconds" to {_p::*}
+                send "&c⚠ Chat slow mode is &r%{chat::slow}% seconds &cby &r%player%" to {_s::*}
+            else:
+                send "&aChat slow mode disabled" to {_p::*}
+                send "&aChat slow mode disabled by &r%player%" to {_s::*}
+                delete {chat::slow}
+
+        #NOTE: RELOAD COMMAND
+        else if arg 1 is "reload":
+            if player has permissions "op":
+                unload yaml "chat"
+                send "&aReloaded Chat!"
+                
+        else:
+            send {sys::perms}
+
+on tab complete of "/chat":
+    set tab completions for position 1 to "help", "clear", "mute", "slow"
