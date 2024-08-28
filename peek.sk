@@ -32,3 +32,75 @@ function peekHelp():
     #createDoc({_n}, {_b}, " &e&l> &r&6/peek chatlog")
     #createDoc({_n}, {_b}, " &e&l> &r&6/peek chatlog clear")
     #createDoc({_n}, {_b}, " &e&l> &r&6/peek chatlog index <int>")
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           COMMAND
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+
+command /peek [<text>] [<text>] [<text>]:
+    description: debug reveal variables made by skript
+    permission: op
+    permission message: &cYou do not haver permissions to perform this command!
+    trigger:
+
+        #NOTE: HELP
+        if arg 1 is "help":
+            readDoc("peek", "peek help", player, arg 2)
+        else if arg 1 is not set:
+            readDoc("peek", "peek help", player, arg 2)
+
+        #NOTE: PERMISSIONS
+        else if arg 1 is "perms":
+            if arg 2 is set:
+                set {_r::*} to snitch(arg 2)
+                send "{@debug} {@prefix} &fChecking: %arg 2%"
+                send "{@debug} {@prefix} &fFound: %{_r::*}%"
+            else:
+                send {cmd::error}
+        
+        #NOTE: Channel
+        else if arg 1 is "channel":
+            if arg 2 is set:
+                #NOTE: Player
+                if arg 3 is set:
+                    set {_player} to arg 3 parsed as player's uuid
+                    set {_p} to arg 3
+                else:
+                    set {_player} to player's uuid
+                    set {_p} to player
+                #NOTE: Local
+                if arg 2 is "local":
+                    send ""
+                    send "&e&l-Local %{_p}% Wallet-"
+                    loop {channel::%arg 2%::%{_player}%::*}:
+                        set {_t::*} to loop-value split at " "
+                        set {_player} to {_t::1} parsed as player
+                        send "&7%loop-index% (%{_player}%) &f%loop-value%"
+                    send ""
+
+        else if arg 1 is "reload":
+            if player has permission "op":
+                deleteDoc("peek")
+                peekHelp()
+                send "&aReloaded Peek!"
+
+        #NOTE: ERROR
+        else:
+            send {cmd::error}
+        
+#        #NOTE: Chatlog
+#        if arg 1 is "chatlog":
+#            if arg 2 is not set:
+#                send "&e&l[DEBUG] &r&2&lChatLog> &f%{msg.chat::*}%" and "&e&l[DEBUG] &r&2&lChatLog> &eLength: &f%{msg.chat.len}%"
+#            #NOTE: Clear chat log
+#            if arg 2 is "clear":
+#                delete {msg.chat::*}
+#                delete {msg.chat.len}
+#                send "&e&l[DEBUG] &r&2&lChatLog> &cCleared Chat Log"
+#            #NOTE: Index return contents
+#            if arg 2 is "index":
+#                set {_arg.3} to arg 3
+#                send "&e&l[DEBUG] &r&2&lChatLog> &r&eIndex of: &f%{_arg.3}% &eMsg: &f%{msg.chat::%{_arg.3}%}%"
