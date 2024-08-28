@@ -116,3 +116,29 @@ on chat:
         if {_w::2} parsed as integer is 1:
             set {_wallet::%loop-index%} to "%{_w::1}% 1" 
     set {channel::local::%player's uuid%::*} to {_wallet::*}
+        
+
+    #NOTE: Radius - receiving and sending contact info
+    loop players in radius 5 of player:
+        if loop-player is not player:
+            #Host Speaking - recieving client contact id's
+            set {_id} to {channel::local.id::%loop-player's uuid%}
+            set {channel::local::%player's uuid%::%{_id}%} to "%loop-player's uuid% 0"
+            #Client Listening - sending host contact id's
+            loop {_wallet::*}:
+                set {_w::*} to loop-value-2 split at " "
+                set {channel::local::%loop-player's uuid%::%loop-index%} to "%{_w::1}% 0"
+
+
+    #NOTE: Chat
+    loop {channel::local::%player's uuid%::*}:
+        set {_t::*} to loop-value split at " "
+        add {_t::1} parsed as player to {_p::*}
+    send "&7&lLC &7%player's prefix%%player's display name% » &f%message%" to {_p::*}
+    #send "&7&lL00%{_id}% %player% » &f%message%" to {_p::*}
+    send "&a&lGC &7%player's prefix%%player% » &f%message%" to {_p::*}
+    send "&d&lSC &7%player's prefix%%player% » &f%message%"
+    send "%player's prefix%%player% » %message%" to console
+        
+
+

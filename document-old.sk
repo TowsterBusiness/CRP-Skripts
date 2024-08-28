@@ -1,0 +1,64 @@
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           DOCUMENTATION
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+options:
+    length: 7
+
+on Skript stop:
+    delete {doc::*}
+
+
+#==========================================================================================================#
+# -------------------------------------------------------------------------------------------------------- #
+#                                           FUNCTION
+# -------------------------------------------------------------------------------------------------------- #
+#==========================================================================================================#
+
+
+#CREATE Document
+function createDoc(name: text, c: text, v: text):
+    add {_v} to {doc::%{_name}%.%{_c}%::*}
+
+
+#DELETE Document
+function deleteDoc(name: text):
+    delete {doc::%{_name}%.head::*}
+    delete {doc::%{_name}%.body::*}
+
+
+#READ Document
+function readDoc(name: text, cmd: text, p: player, page: text):
+    #NOTE: MAX PAGE
+    set {_page} to {_page} parsed as integer
+    if {_page} is set:
+        set {_max} to {_page} * {@length}
+        set {_line} to {_max} - {@length}
+    else if {_page} is not set:
+        set {_page} to 1
+        set {_max} to {@length}
+        set {_line} to {_max} - {@length}
+    #NOTE: ROUND PAGE
+    set {_pagemax} to "%size of {doc::%{_name}%.body::*}%" parsed as number
+    set {_pagemax} to {_pagemax} / {@length}
+    set {_round} to round({_pagemax})
+    if {_pagemax} > {_round}:
+        set {_pagemax} to {_round} + 1
+    else:
+        set {_pagemax} to {_round}
+
+    set {_back} to {_page} - 1
+    set {_next} to {_page} + 1
+    #----DEBUG-----#
+    #send " " to {_p}
+    #send "&7Request: %{_page}%" to {_p}
+    #send "&7Max: %{_max}%" to {_p}
+    #send "&7Start: %{_line}%" to {_p}
+
+
+    send " " to {_p}
+    #NOTE: HEADER
+    loop {doc::%{_name}%.head::*}:
+        send loop-value to {_p}
