@@ -98,4 +98,42 @@ function dormOwner(p: player, block: block):
         send "yaw270" to {_p}
         set {_v::1} to location of {_block} offset by vector(-1, -1, 1)
         set {_v::2} to location of {_block} offset by vector(-1, -1, -1)
+
+    #send {_v::1} to {_p}
+    #send {_v::2} to {_p}
+    # door check
+    if block at {_v::1} is dark oak door:
+        set {_door} to {_v::1}
+    else if block at {_v::2} is dark oak door:
+        set {_door} to {_v::2}
     
+    {_door} is set
+    set {_xyz} to stringLocation({_door})
+    send {_xyz} to {_p}
+
+    send {_door} to {_p}
+    set yaml value "room.%{_p}'s uuid%.yaw" from "dorm" to yaw of location of {_block}
+    set yaml value "room.%{_p}'s uuid%.sign" from "dorm" to {_block}
+    set yaml value "room.%{_p}'s uuid%.door" from "dorm" to block at {_door}
+    set yaml value "room.%{_p}'s uuid%.status" from "dorm" to "private"
+    set yaml value "door.%{_xyz}%" from "dorm" to {_p}'s uuid
+    set yaml value "dorm.invite.%{_p}'s uuid%" from "player/%{_p}'s uuid%" to true
+
+    set line 3 of {_block} to "&0%{_p}'s display name%"
+    set line 4 of {_block} to "&4&l[Private]"
+    send "&aYou have reserved &r%line 2 of {_block}%" to {_p}
+    play sound "block.anvil.land" with pitch 2 to {_p}
+
+
+    # set block 2 blocks behind {_block} to oak_wall_sign
+    # set line 1 of block 2 blocks behind {_sign} to "-+-"
+    # set line 2 of block 2 blocks behind {_sign} to "&c&l[Private Room]"
+    # set line 3 of block 2 blocks behind {_sign} to "Keeping Players"
+    # set line 4 oof block 2 blocks behind {_sign} to "Out"
+
+
+function stringLocation(l: Location) :: string:
+    set {_xyz} to "%X-coordinates of {_l}%%Y-coordinates of {_l}%%Z-coordinates of {_l}%"
+    replace all "." with "" in {_xyz}
+    return {_xyz}
+
