@@ -73,3 +73,29 @@ on rightclick on sign:
             line 3 is ""
             dormOwner(player, event-block)
 
+
+#DOOR LOOKUP
+function dormOwner(p: player, block: block):
+    # sign pos offset to door
+    # yaw -180
+    send yaw of location of {_block} to {_p}
+    if yaw of location of {_block} is 180:
+        send "yaw180" to {_p}
+        set {_v::1} to location of {_block} offset by vector(-1, -1, 1)
+        set {_v::2} to location of {_block} offset by vector(1, -1, 1)
+    # yaw 0
+    else if yaw of location of {_block} is 0:
+        send "yaw0" to {_p}
+        set {_v::1} to location of {_block} offset by vector(-1, -1, -1)
+        set {_v::2} to location of {_block} offset by vector(1, -1, -1)
+    # yaw 90
+    else if yaw of location of {_block} is 90: 
+        send "yaw90" to {_p}
+        set {_v::1} to location of {_block} offset by vector(1, -1, -1)
+        set {_v::2} to location of {_block} offset by vector(1, -1, 1)
+    # yaw -90
+    else if yaw of location of {_block} is 270: 
+        send "yaw270" to {_p}
+        set {_v::1} to location of {_block} offset by vector(-1, -1, 1)
+        set {_v::2} to location of {_block} offset by vector(-1, -1, -1)
+    
